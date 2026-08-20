@@ -1,0 +1,583 @@
+views:
+  - title: Main
+    path: people
+    icon: mdi:star
+    layout:
+      width: 350
+    badges:
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.bee_motion_is_dark
+      - type: entity
+        entity: sensor.office_temp_room_temperature
+      - type: entity
+        entity: sensor.office_temp_room_humidity
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:stack-in-card
+            cards:
+              - type: markdown
+                content: <ha-icon icon="mdi:account-multiple"></ha-icon> Family
+                style: |
+                  ha-card { 
+                    font-size: 20px; 
+                  }
+              - type: horizontal-stack
+                mode: horizontal
+                cards:
+                  - type: custom:button-card
+                    entity: person.office_mike
+                    aspect_ratio: 4/4
+                    show_name: false
+                    show_icon: false
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: url("/local/me.png")
+                        - background-size: 99%
+                        - background-repeat: no-repeat
+                        - background-position: top center
+                        - --keep-background: 'true'
+                      custom_fields:
+                        location:
+                          - text-transform: capitalize
+                          - position: absolute
+                          - left: 4%
+                          - top: 4%
+                          - background-color: rgba(0, 0, 0, 0.6)
+                          - border-radius: 12px
+                          - padding: 2px 6px
+                          - display: flex
+                          - align-items: center
+                          - justify-content: center
+                          - color: '#FFFFFF'
+                        steps:
+                          - position: absolute
+                          - left: 50%
+                          - top: 4%
+                          - transform: translateX(-50%)
+                          - display: flex
+                          - align-items: center
+                          - gap: 4px
+                          - font-size: 12px
+                          - font-weight: bold
+                          - background-color: rgba(0, 0, 0, 0.6)
+                          - border-radius: 12px
+                          - padding: 2px 8px
+                          - color: '#FFFFFF'
+                        battery:
+                          - align-self: right
+                          - position: absolute
+                          - right: 4%
+                          - top: 4%
+                          - display: flex
+                          - align-items: center
+                          - gap: 4px
+                          - font-size: 12px
+                          - font-weight: bold
+                          - background-color: rgba(0, 0, 0, 0.6)
+                          - border-radius: 12px
+                          - padding: 2px 8px
+                          - color: '#FFFFFF'
+                    custom_fields:
+                      location: |
+                        [[[
+                          const loc = states["sensor.mikes_iphone_geocoded_location"]?.state;
+                          if (loc === "not_home")
+                            return `<ha-icon icon="mdi:home-export-outline" style="width: 18px; height: 18px; color: #e45649;"></ha-icon>`;
+                          if (loc === "Work")
+                            return `<ha-icon icon="mdi:office-building" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                          return `<ha-icon icon="mdi:home" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                        ]]]
+                      steps: |
+                        [[[
+                          const steps = states['sensor.mikes_iphone_steps']?.state || '0';
+                          const stepsNum = Number(steps);
+                          const color = stepsNum < 10000 ? "#e45649" : "#50A14F";
+                          return `<ha-icon icon="mdi:walk" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${steps}</span>`;
+                        ]]]
+                      battery: |
+                        [[[
+                          const bat = Number(states['sensor.mikes_iphone_battery_level']?.state || 100);
+                          let color = "#50A14F";
+                          if (bat <= 30) color = "#e45649";
+                          else if (bat <= 50) color = "#ffa229";
+                          return `<ha-icon icon="mdi:battery" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${bat}%</span>`;
+                        ]]]
+                    style: |
+                      ha-card { 
+                        background: rgba(10, 10, 10, 0);
+                      }
+                  - type: custom:button-card
+                    entity: person.callie
+                    aspect_ratio: 4/4
+                    show_name: false
+                    show_icon: false
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: url("/local/callie.png")
+                        - background-size: 99%
+                        - background-repeat: no-repeat
+                        - background-position: top center
+                        - --keep-background: 'true'
+                      custom_fields:
+                        location:
+                          - text-transform: capitalize
+                          - position: absolute
+                          - left: 4%
+                          - top: 4%
+                          - background-color: rgba(0, 0, 0, 0.6)
+                          - border-radius: 12px
+                          - padding: 2px 6px
+                          - display: flex
+                          - align-items: center
+                          - justify-content: center
+                          - color: '#FFFFFF'
+                        steps:
+                          - position: absolute
+                          - left: 50%
+                          - top: 4%
+                          - transform: translateX(-50%)
+                          - display: flex
+                          - align-items: center
+                          - gap: 4px
+                          - font-size: 12px
+                          - font-weight: bold
+                          - background-color: rgba(0, 0, 0, 0.6)
+                          - border-radius: 12px
+                          - padding: 2px 8px
+                          - color: '#FFFFFF'
+                        battery:
+                          - align-self: right
+                          - position: absolute
+                          - right: 4%
+                          - top: 4%
+                          - display: flex
+                          - align-items: center
+                          - gap: 4px
+                          - font-size: 12px
+                          - font-weight: bold
+                          - background-color: rgba(0, 0, 0, 0.6)
+                          - border-radius: 12px
+                          - padding: 2px 8px
+                          - color: '#FFFFFF'
+                    custom_fields:
+                      location: |
+                        [[[
+                          const loc = states["sensor.iphone_geolocation"]?.state;
+                          if (loc === "not_home")
+                            return `<ha-icon icon="mdi:home-export-outline" style="width: 18px; height: 18px; color: #e45649;"></ha-icon>`;
+                          if (loc === "Work")
+                            return `<ha-icon icon="mdi:office-building" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                          return `<ha-icon icon="mdi:home" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                        ]]]
+                      steps: |
+                        [[[
+                          const steps = states['sensor.iphone_steps']?.state || '0';
+                          const stepsNum = Number(steps);
+                          const color = stepsNum < 10000 ? "#e45649" : "#50A14F";
+                          return `<ha-icon icon="mdi:walk" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${steps}</span>`;
+                        ]]]
+                      battery: |
+                        [[[
+                          const bat = Number(states['sensor.iphone_battery_level']?.state || 100);
+                          let color = "#50A14F";
+                          if (bat <= 30) color = "#e45649";
+                          else if (bat <= 50) color = "#ffa229";
+                          return `<ha-icon icon="mdi:battery" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${bat}%</span>`;
+                        ]]]
+                    style: |
+                      ha-card { 
+                        background: rgba(10, 10, 10, 0);
+                      }
+              - type: map
+                entities:
+                  - entity: person.office_mike
+                  - entity: person.callie
+                  - entity: zone.home
+                  - entity: zone.work
+                aspect_ratio: '4:2'
+                dark_mode: true
+                style: |
+                  ha-card { 
+                    font-size: 20px;
+                  }
+      - type: vertical-stack
+        cards:
+          - type: custom:stack-in-card
+            cards:
+              - type: markdown
+                content: <ha-icon icon="mdi:shield"></ha-icon> Security
+                style: |
+                  ha-card {
+                    font-size: 20px;
+                    box-shadow: none;
+                    background: rgba(10, 10, 10, 0);
+                  }
+              - type: glance
+                entities:
+                  - entity: binary_sensor.front_door_sensor
+                    name: Front Door
+                  - entity: binary_sensor.back_door_sensor
+                    name: Back Door
+                  - entity: binary_sensor.sengled_deck_door
+                    name: Deck Door
+                  - entity: binary_sensor.sengled_garage_mandoor
+                    name: Garage Door
+                style: |
+                  ha-card {
+                    box-shadow: none;
+                    background: rgba(10, 10, 10, 0);
+                  }
+              - type: glance
+                entities:
+                  - entity: binary_sensor.blink_front_door_motion_detected
+                    name: Front Door
+                  - entity: binary_sensor.blink_back_motion_detected
+                    name: Back Door
+                  - entity: binary_sensor.zse40_motion_sensor
+                    name: Kitchen
+                  - entity: binary_sensor.garage_motion_sensor_aqara
+                    name: Garage
+                  - entity: binary_sensor.aqara_motion_sensor
+                    name: Basement
+                style: |
+                  ha-card {
+                    box-shadow: none;
+                    background: rgba(10, 10, 10, 0);
+                  }
+              - type: glance
+                entities:
+                  - entity: alarm_control_panel.alexa_guard_a7ffa
+                  - entity: alarm_control_panel.blink_home
+                style: |
+                  ha-card {
+                    box-shadow: none;
+                    background: rgba(10, 10, 10, 0);
+                  }
+          - type: custom:vertical-stack-in-card
+            cards:
+              - type: markdown
+                content: >-
+                  <ha-icon icon="mdi:white-balance-sunny"></ha-icon> Weather -
+                  {{ state_attr('weather.forecast_home', 'temperature') }} °F
+                style: |
+                  ha-card { 
+                    background: rgba(10, 10, 10, 0);
+                    font-size: 20px;
+                    box-shadow: none;
+                  }
+              - type: weather-forecast
+                entity: weather.forecast_home
+                show_current: false
+                show_forecast: true
+                forecast_type: daily
+                style: |
+                  ha-card { 
+                  background: rgba(10, 10, 10, 0);
+                  box-shadow: none;
+                  }
+          - type: custom:vertical-stack-in-card
+            cards:
+              - type: markdown
+                content: <ha-icon icon="mdi:car-lifted-pickup"></ha-icon> Silverado
+                style: |
+                  ha-card { 
+                    font-size: 20px;
+                    background-color: rgba(0,0,0,0);
+                    box-shadow: none;
+                  }
+              - type: entities
+                entities:
+                  - entity: sensor.silverado_fuel_level_gal
+                    icon: mdi:gas-station
+                    name: Fuel Level
+                  - entity: sensor.silverado_mpg
+                    icon: mdi:speedometer-slow
+                    name: Fuel Efficiency
+                  - entity: sensor.silverado_trip_mpg
+                    icon: mdi:speedometer
+                    name: Fuel Efficiency (Trip)
+                  - entity: sensor.silverado_dte
+                    icon: mdi:alpha-e-box-outline
+                    name: DTE
+                style: |
+                  ha-card { 
+                    background: url("/local/2014_Chevy_Silverado_1500_2.png");
+                    background-repeat: no-repeat;
+                    background-position: top right;
+                    background-size: 60%;
+                    background-color: rgba(0,0,0,0);
+                    font-size: 15px;
+                  }
+      - type: custom:button-card
+        entity: camera.ai_pro
+        name: Protect
+        show_name: true
+        show_state: false
+        grid_options:
+          columns: 1
+          rows: 1
+        triggers_update:
+          - event.ai_pro_motion_detection
+          - event.ai_pro_smart_detection
+          - event.ai_pro_sound_detection
+          - event.ai_pro_vehicle
+        tap_action:
+          action: navigate
+          navigation_path: /dashboard-dashboard/protect-view
+        styles:
+          card:
+            - width: 65px
+            - height: 75px
+            - margin: auto
+            - padding: 4px
+          grid:
+            - grid-template-areas: '"i" "n"'
+            - grid-template-rows: 1fr auto
+            - grid-template-columns: 1fr
+          name:
+            - font-size: 11px
+            - font-weight: bold
+            - padding-top: 2px
+        custom_fields:
+          i: |
+            [[[
+              const isRecentlyTriggered = (id) => {
+                const entity = states[id];
+                if (!entity || !entity.state) return false;
+                
+                const stateVal = entity.state.toLowerCase();
+                if (['idle', 'off', 'unavailable', 'unknown', ''].includes(stateVal)) {
+                  return false;
+                }
+
+                const eventTime = new Date(entity.state).getTime() || new Date(entity.last_updated).getTime();
+                if (isNaN(eventTime)) return false;
+
+                const secondsAgo = (Date.now() - eventTime) / 1000;
+                return secondsAgo < 10;
+              };
+
+              const motion = isRecentlyTriggered('event.ai_pro_motion_detection');
+              const smart = isRecentlyTriggered('event.ai_pro_smart_detection');
+              const sound = isRecentlyTriggered('event.ai_pro_sound_detection');
+              const vehicle = isRecentlyTriggered('event.ai_pro_vehicle');
+
+              const isActive = motion || smart || sound || vehicle;
+
+              const filterStyle = isActive
+                ? "invert(42%) sepia(85%) saturate(1638%) hue-rotate(326deg) brightness(96%) contrast(90%)"
+                : "invert(52%) sepia(18%) saturate(1352%) hue-rotate(74deg) brightness(96%) contrast(88%)";
+
+              return `<img src="/local/protect.png" style="
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                pointer-events: none;
+                filter: ${filterStyle};
+              " />`;
+            ]]]
+      - type: custom:flightradar24-radar-card
+        flights_entity: sensor.flightradar24_current_in_area
+        radar:
+          range: 25
+          min_range: 5
+          max_range: 25
+          aircraft-marker-size: x-large
+          background_map: satellite
+        location_tracker: zone.home
+        units:
+          distance: miles
+        list: {}
+      - type: custom:vertical-stack-in-card
+        cards:
+          - type: markdown
+            content: <ha-icon icon="mdi:thermostat"></ha-icon> Climate Control
+            style: |
+              ha-card { 
+                background: url("/local/google-nest-logo-transparent-png.png");
+                background-repeat: no-repeat;
+                background-position: right;
+                background-size: 15%;
+                background-color: rgba(0,0,0,0);
+                font-size: 20px;
+                box-shadow: none;
+                margin: 0px 10px 0px 0px;
+              }
+          - type: custom:simple-thermostat
+            entity: climate.living_room
+            header:
+              name: Living Room Thermostat
+              icon: null
+            decimals: 0
+            step_size: 1
+            control: false
+            layout:
+              step: row
+            style: |
+              ha-card { 
+                --st-font-size-title: 18px;
+                background: rgba(10, 10, 10, 0);
+                font-size: 10px;
+                box-shadow: none;
+              }
+          - type: custom:simple-thermostat
+            entity: climate.master_bedroom
+            header:
+              name: Master Bedroom Thermostat
+              icon: null
+            decimals: 0
+            step_size: 1
+            control: false
+            layout:
+              step: row
+            style: |
+              ha-card { 
+                --st-font-size-title: 18px;
+                background: rgba(10, 10, 10, 0);
+                font-size: 10px;
+                box-shadow: none;
+                margin: 0px 0px 16px 0px; 
+              }
+          - type: custom:simple-thermostat
+            entity: climate.basement
+            header:
+              name: Basement Thermostat
+              icon: null
+            decimals: 0
+            step_size: 1
+            control: false
+            layout:
+              step: row
+            style: |
+              ha-card { 
+                --st-font-size-title: 18px;
+                background: rgba(10, 10, 10, 0);
+                font-size: 10px;
+                box-shadow: none;
+                margin: 0px 0px 30px 0px; 
+              }
+          - type: horizontal-stack
+            cards:
+              - type: custom:mini-graph-card
+                entities:
+                  - sensor.living_room_temperature_round
+                line_color: white
+                name: Living Rm. Temp
+                animate: true
+                style: |
+                  ha-card { 
+                    background: rgba(10, 10, 10, 0);
+                    font-size: 20px;
+                    box-shadow: none;
+                    margin: 0px 5px 0px 0px; 
+                  }
+              - type: custom:mini-graph-card
+                entities:
+                  - sensor.master_bedroom_temperature_round
+                line_color: white
+                name: Bedroom Temp
+                animate: true
+                style: |
+                  ha-card { 
+                    background: rgba(0, 0, 0, 0);
+                    font-size: 20px;
+                    box-shadow: none;
+                    margin: 0px 0px 0px 5px; 
+                  }
+          - type: horizontal-stack
+            cards:
+              - type: custom:mini-graph-card
+                entities:
+                  - sensor.basement_temperature_round
+                line_color: white
+                name: Basement Temp
+                animate: true
+                style: |
+                  ha-card { 
+                    background: rgba(0, 0, 0, 0);
+                    font-size: 20px;
+                    box-shadow: none;
+                    margin: 0px 5px 0px 0px; 
+                  }
+              - type: custom:mini-graph-card
+                entities:
+                  - sensor.office_smartthings_button_temperature
+                line_color: white
+                name: Office Temp
+                animate: true
+                style: |
+                  ha-card { 
+                    background: rgba(0, 0, 0, 0);
+                    font-size: 20px;
+                    box-shadow: none;
+                    margin: 0px 0px 0px 5px; 
+                  }
+          - type: horizontal-stack
+            cards:
+              - type: custom:mini-graph-card
+                entities:
+                  - sensor.blink_front_door_temperature
+                line_color: white
+                name: Outside Front
+                animate: true
+                style: |
+                  ha-card { 
+                    background: rgba(0, 0, 0, 0);
+                    font-size: 20px;
+                    box-shadow: none;
+                    margin: 0px 5px 0px 0px; 
+                  }
+              - type: custom:mini-graph-card
+                entities:
+                  - sensor.blink_back_temperature
+                line_color: white
+                name: Outside Back
+                animate: true
+                style: |
+                  ha-card { 
+                    background: rgba(0, 0, 0, 0);
+                    font-size: 20px;
+                    box-shadow: none;
+                    margin: 0px 0px 0px 5px; 
+                  }
+  - type: sections
+    max_columns: 1
+    title: Protect View
+    path: protect-view
+    subview: true
+    sections:
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: picture-glance
+                title: Live Stream
+                entities: []
+                camera_image: camera.ai_pro
+                live_view: live
+              - type: picture-entity
+                title: Latest Trigger Snapshot
+                entity: event.ai_pro_motion_detection
+                camera_image: camera.ai_pro
+                show_state: false
+                show_name: false
+              - type: logbook
+                entities:
+                  - event.ai_pro_motion_detection
+                  - event.ai_pro_smart_detection
+                  - event.ai_pro_sound_detection
+                  - event.ai_pro_vehicle
+                hours_to_show: 24
+      - type: grid
+        cards:
+          - type: heading
+            heading: camera.ai_pro
+          - type: tile
+            entity: camera.camera_ai_pro
+            show_entity_picture: true
