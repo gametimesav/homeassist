@@ -1,0 +1,191 @@
+type: vertical-stack
+cards:
+  - type: custom:stack-in-card
+    cards:
+      - type: markdown
+        content: <ha-icon icon="mdi:account-multiple"></ha-icon> Family
+        style: |
+          ha-card { 
+            font-size: 20px; 
+          }
+      - type: horizontal-stack
+        mode: horizontal
+        cards:
+          - type: custom:button-card
+            entity: person.office_mike
+            aspect_ratio: 4/4
+            show_name: false
+            show_icon: false
+            styles:
+              card:
+                - padding: 4%
+                - background-image: url("/local/me.png")
+                - background-size: 99%
+                - background-repeat: no-repeat
+                - background-position: top center
+                - --keep-background: 'true'
+              custom_fields:
+                location:
+                  - text-transform: capitalize
+                  - position: absolute
+                  - left: 4%
+                  - top: 4%
+                  - background-color: rgba(0, 0, 0, 0.6)
+                  - border-radius: 12px
+                  - padding: 2px 6px
+                  - display: flex
+                  - align-items: center
+                  - justify-content: center
+                  - color: '#FFFFFF'
+                steps:
+                  - position: absolute
+                  - left: 50%
+                  - top: 4%
+                  - transform: translateX(-50%)
+                  - display: flex
+                  - align-items: center
+                  - gap: 4px
+                  - font-size: 12px
+                  - font-weight: bold
+                  - background-color: rgba(0, 0, 0, 0.6)
+                  - border-radius: 12px
+                  - padding: 2px 8px
+                  - color: '#FFFFFF'
+                battery:
+                  - align-self: right
+                  - position: absolute
+                  - right: 4%
+                  - top: 4%
+                  - display: flex
+                  - align-items: center
+                  - gap: 4px
+                  - font-size: 12px
+                  - font-weight: bold
+                  - background-color: rgba(0, 0, 0, 0.6)
+                  - border-radius: 12px
+                  - padding: 2px 8px
+                  - color: '#FFFFFF'
+            custom_fields:
+              location: |
+                [[[
+                  const loc = states["sensor.mikes_iphone_geocoded_location"]?.state;
+                  if (loc === "not_home")
+                    return `<ha-icon icon="mdi:home-export-outline" style="width: 18px; height: 18px; color: #e45649;"></ha-icon>`;
+                  if (loc === "Work")
+                    return `<ha-icon icon="mdi:office-building" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                  return `<ha-icon icon="mdi:home" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                ]]]
+              steps: |
+                [[[
+                  const steps = states['sensor.mikes_iphone_steps']?.state || '0';
+                  const stepsNum = Number(steps);
+                  const color = stepsNum < 10000 ? "#e45649" : "#50A14F";
+                  return `<ha-icon icon="mdi:walk" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${steps}</span>`;
+                ]]]
+              battery: |
+                [[[
+                  const bat = Number(states['sensor.mikes_iphone_battery_level']?.state || 100);
+                  let color = "#50A14F";
+                  if (bat <= 30) color = "#e45649";
+                  else if (bat <= 50) color = "#ffa229";
+                  return `<ha-icon icon="mdi:battery" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${bat}%</span>`;
+                ]]]
+            style: |
+              ha-card { 
+                background: rgba(10, 10, 10, 0);
+              }
+          - type: custom:button-card
+            entity: person.callie
+            aspect_ratio: 4/4
+            show_name: false
+            show_icon: false
+            styles:
+              card:
+                - padding: 4%
+                - background-image: url("/local/callie.png")
+                - background-size: 99%
+                - background-repeat: no-repeat
+                - background-position: top center
+                - --keep-background: 'true'
+              custom_fields:
+                location:
+                  - text-transform: capitalize
+                  - position: absolute
+                  - left: 4%
+                  - top: 4%
+                  - background-color: rgba(0, 0, 0, 0.6)
+                  - border-radius: 12px
+                  - padding: 2px 6px
+                  - display: flex
+                  - align-items: center
+                  - justify-content: center
+                  - color: '#FFFFFF'
+                steps:
+                  - position: absolute
+                  - left: 50%
+                  - top: 4%
+                  - transform: translateX(-50%)
+                  - display: flex
+                  - align-items: center
+                  - gap: 4px
+                  - font-size: 12px
+                  - font-weight: bold
+                  - background-color: rgba(0, 0, 0, 0.6)
+                  - border-radius: 12px
+                  - padding: 2px 8px
+                  - color: '#FFFFFF'
+                battery:
+                  - align-self: right
+                  - position: absolute
+                  - right: 4%
+                  - top: 4%
+                  - display: flex
+                  - align-items: center
+                  - gap: 4px
+                  - font-size: 12px
+                  - font-weight: bold
+                  - background-color: rgba(0, 0, 0, 0.6)
+                  - border-radius: 12px
+                  - padding: 2px 8px
+                  - color: '#FFFFFF'
+            custom_fields:
+              location: |
+                [[[
+                  const loc = states["sensor.iphone_geolocation"]?.state;
+                  if (loc === "not_home")
+                    return `<ha-icon icon="mdi:home-export-outline" style="width: 18px; height: 18px; color: #e45649;"></ha-icon>`;
+                  if (loc === "Work")
+                    return `<ha-icon icon="mdi:office-building" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                  return `<ha-icon icon="mdi:home" style="width: 18px; height: 18px; color: #50A14F;"></ha-icon>`;
+                ]]]
+              steps: |
+                [[[
+                  const steps = states['sensor.iphone_steps']?.state || '0';
+                  const stepsNum = Number(steps);
+                  const color = stepsNum < 10000 ? "#e45649" : "#50A14F";
+                  return `<ha-icon icon="mdi:walk" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${steps}</span>`;
+                ]]]
+              battery: |
+                [[[
+                  const bat = Number(states['sensor.iphone_battery_level']?.state || 100);
+                  let color = "#50A14F";
+                  if (bat <= 30) color = "#e45649";
+                  else if (bat <= 50) color = "#ffa229";
+                  return `<ha-icon icon="mdi:battery" style="width: 18px; height: 18px; color: ${color};"></ha-icon><span>${bat}%</span>`;
+                ]]]
+            style: |
+              ha-card { 
+                background: rgba(10, 10, 10, 0);
+              }
+      - type: map
+        entities:
+          - entity: person.office_mike
+          - entity: person.callie
+          - entity: zone.home
+          - entity: zone.work
+        aspect_ratio: '4:2'
+        dark_mode: true
+        style: |
+          ha-card { 
+            font-size: 20px;
+          }
