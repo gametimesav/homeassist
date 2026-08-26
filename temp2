@@ -1,0 +1,112 @@
+# ============================================================
+# Temp2 - ESP32 DevKit V1
+#
+# Sensors:
+#   AHT20  = Temperature / Humidity
+#   BMP280 = Barometric Temperature / Pressure
+#
+# I2C:
+#   SDA = GPIO21
+#   SCL = GPIO22
+#
+# Update interval:
+#   All sensors = 60 seconds
+# ============================================================
+
+
+esphome:
+  name: temp2
+  friendly_name: Temp2
+
+
+esp32:
+  board: esp32dev
+  variant: esp32
+  flash_size: 4MB
+
+  framework:
+    type: esp-idf
+
+    advanced:
+      minimum_chip_revision: "3.1"
+      sram1_as_iram: true
+
+
+logger:
+  level: INFO
+
+
+api:
+  encryption:
+    key: !secret temp2_api_key
+
+  reboot_timeout: 15min
+
+
+ota:
+  - platform: esphome
+    password: !secret temp2_ota_password
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  fast_connect: true
+  reboot_timeout: 15min
+
+  ap:
+    ssid: "Temp2 Fallback Hotspot"
+    password: !secret temp2_fallback_password
+
+
+captive_portal:
+
+
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+  frequency: 100kHz
+  scan: false
+
+
+sensor:
+
+  # ----------------------------------------------------------
+  # AHT20
+  # Temperature + Humidity
+  # ----------------------------------------------------------
+
+  - platform: aht10
+    variant: AHT20
+    update_interval: 60s
+
+    temperature:
+      name: "Temperature"
+      id: mike_office_temp
+      accuracy_decimals: 1
+
+    humidity:
+      name: "Humidity"
+      id: mike_office_hum
+      accuracy_decimals: 1
+
+
+  # ----------------------------------------------------------
+  # BMP280
+  # Barometric Temperature + Pressure
+  # ----------------------------------------------------------
+
+  - platform: bmp280_i2c
+    address: 0x77
+    update_interval: 60s
+
+    temperature:
+      name: "Barometric Temperature"
+      accuracy_decimals: 1
+      oversampling: 2x
+
+    pressure:
+      name: "Barometric Pressure"
+      accuracy_decimals: 1
+      oversampling: 16x
