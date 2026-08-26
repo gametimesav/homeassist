@@ -1,0 +1,591 @@
+# ============================================================
+# Bee Motion S3 - FINAL CONFIGURATION
+#
+# Hardware:
+#   Battery ADC          GPIO1
+#   Ambient Light ADC    GPIO3
+#   PIR Motion           GPIO4
+#   LDO2 Peripheral EN   GPIO34
+#
+# Home Assistant entities:
+#   - Motion
+#   - Dark Detected
+#   - Ambient Light Voltage
+#   - Battery Level
+#
+# Deep sleep:
+#   - PIR wake on GPIO4 HIGH
+#   - Timer wake every 30 minutes
+#
+# Light calibration:
+#   Covered      = ~0.000 V
+#   Room light   = ~0.612 V
+#   Bright light = ~3.107 V
+#
+# Darkness hysteresis:
+#   < 0.18 V = Dark
+#   > 0.25 V = Not Dark
+# ============================================================
+
+
+# ============================================================
+# ESPHOME
+# ============================================================
+
+esphome:
+  name: bee-motion-s3
+  friendly_name: Bee Motion S3
+
+  on_boot:
+
+    # --------------------------------------------------------
+    # EARLY BOOT
+    # Power the Bee Motion sensor rail immediately.
+    # --------------------------------------------------------
+
+    - priority: 800
+      then:
+        - switch.turn_on: ldo2_power
+
+
+    # --------------------------------------------------------
+    # NORMAL BOOT
+    # --------------------------------------------------------
+
+    - priority: 200
+      then:
+
+        # Allow LDO2/light sensor to stabilize.
+        - delay: 750ms
+
+
+        # ----------------------------------------------------
+        # DETERMINE WAKE REASON
+        # ----------------------------------------------------
+
+        - lambda: |-
+            id(motion_wake) = false;
+
+            esp_sleep_wakeup_cause_t cause =
+                esp_sleep_get_wakeup_cause();
+
+            if (cause == ESP_SLEEP_WAKEUP_EXT1) {
+
+              uint64_t wake_status =
+                  esp_sleep_get_ext1_wakeup_status();
+
+              if ((wake_status & (1ULL << 4)) != 0) {
+                id(motion_wake) = true;
+              }
+            }
+
+
+        # ----------------------------------------------------
+        # INITIALIZE MOTION BEFORE HA CONNECTS
+        # ----------------------------------------------------
+
+        - binary_sensor.template.publish:
+            id: motion
+            state: !lambda |-
+              return id(motion_wake);
+
+
+        # ----------------------------------------------------
+        # START FAILSAFE TIMER
+        # ----------------------------------------------------
+
+        - script.execute: emergency_sleep
+
+
+        # ----------------------------------------------------
+        # ENABLE WIFI
+        # ----------------------------------------------------
+
+        - wifi.enable:
+
+
+        # ----------------------------------------------------
+        # WAIT FOR HOME ASSISTANT API
+        # ----------------------------------------------------
+
+        - wait_until:
+            condition:
+              api.connected:
+            timeout: 20s
+
+
+        # ----------------------------------------------------
+        # IF HA CONNECTED
+        # ----------------------------------------------------
+
+        - if:
+            condition:
+              api.connected:
+
+            then:
+
+              - script.stop: emergency_sleep
+
+
+              # ------------------------------------------------
+              # READ AMBIENT LIGHT
+              # ------------------------------------------------
+
+              - component.update: ambient_light_voltage
+
+              - delay: 750ms
+
+
+              # ------------------------------------------------
+              # READ BATTERY
+              # ------------------------------------------------
+
+              - component.update: battery_voltage
+
+              - delay: 750ms
+
+
+              # ------------------------------------------------
+              # MOTION WAKE
+              # ------------------------------------------------
+
+              - if:
+                  condition:
+                    lambda: |-
+                      return id(motion_wake);
+
+                  then:
+
+                    # Motion is already ON.
+                    - delay: 5s
+
+                    - binary_sensor.template.publish:
+                        id: motion
+                        state: OFF
+
+                    - delay: 1500ms
+
+                  else:
+
+                    # Explicitly publish clear state.
+                    - binary_sensor.template.publish:
+                        id: motion
+                        state: OFF
+
+                    - delay: 2s
+
+
+              # ------------------------------------------------
+              # WAIT FOR PIR GPIO4 TO RETURN LOW
+              # ------------------------------------------------
+
+              - wait_until:
+                  condition:
+                    binary_sensor.is_off: pir_raw
+                  timeout: 20s
+
+              - delay: 500ms
+
+
+              # ------------------------------------------------
+              # DEEP SLEEP
+              # ------------------------------------------------
+
+              - deep_sleep.enter:
+                  id: deep_sleep_control
+
+
+# ============================================================
+# GLOBALS
+# ============================================================
+
+globals:
+
+  # True only when GPIO4 caused this wake.
+  - id: motion_wake
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+
+  # Stores dark/not-dark state for hysteresis.
+  - id: dark_state
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+
+# ============================================================
+# ESP32
+# ============================================================
+
+esp32:
+  board: bee_motion_s3
+
+  framework:
+    type: arduino
+
+
+# ============================================================
+# LOGGER
+# ============================================================
+
+logger:
+  level: INFO
+  baud_rate: 0
+
+
+# ============================================================
+# HOME ASSISTANT API
+# ============================================================
+
+api:
+  id: api_server
+
+  encryption:
+    key: !secret bee_motion_api_key
+
+  reboot_timeout: 0s
+
+
+# ============================================================
+# OTA
+# ============================================================
+
+ota:
+
+  - platform: esphome
+    password: !secret bee_motion_ota_password
+
+
+# ============================================================
+# WIFI
+# ============================================================
+
+wifi:
+  id: wifi_component
+
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  enable_on_boot: false
+
+  fast_connect: true
+
+  power_save_mode: LIGHT
+
+  reboot_timeout: 0s
+
+
+# ============================================================
+# LDO2 POWER
+#
+# Bee Motion S3 LDO2 = GPIO34
+# ============================================================
+
+switch:
+
+  - platform: gpio
+
+    pin:
+      number: GPIO34
+
+    id: ldo2_power
+
+    internal: true
+
+    restore_mode: ALWAYS_ON
+
+
+# ============================================================
+# BINARY SENSORS
+# ============================================================
+
+binary_sensor:
+
+
+  # ----------------------------------------------------------
+  # RAW PIR
+  #
+  # GPIO4
+  # ----------------------------------------------------------
+
+  - platform: gpio
+
+    pin:
+      number: GPIO4
+
+      mode:
+        input: true
+
+      allow_other_uses: true
+
+    id: pir_raw
+
+    internal: true
+
+
+  # ----------------------------------------------------------
+  # MOTION
+  # ----------------------------------------------------------
+
+  - platform: template
+
+    name: "Motion"
+
+    id: motion
+
+    device_class: motion
+
+
+  # ----------------------------------------------------------
+  # DARK DETECTED
+  #
+  # IMPORTANT:
+  # No device_class is used here.
+  #
+  # Home Assistant should therefore display:
+  #
+  #   ON  = Dark
+  #   OFF = Not Dark
+  #
+  # and should NOT say "Light" / "No light".
+  # ----------------------------------------------------------
+
+  - platform: template
+
+    name: "Dark Detected"
+
+    id: dark_detected
+
+
+# ============================================================
+# SENSORS
+# ============================================================
+
+sensor:
+
+
+  # ----------------------------------------------------------
+  # AMBIENT LIGHT VOLTAGE
+  #
+  # GPIO3
+  # ----------------------------------------------------------
+
+  - platform: adc
+
+    pin: GPIO3
+
+    id: ambient_light_voltage
+
+    name: "Ambient Light Voltage"
+
+    unit_of_measurement: "V"
+
+    accuracy_decimals: 3
+
+    attenuation: 12db
+
+    update_interval: never
+
+    force_update: true
+
+
+    # --------------------------------------------------------
+    # DARKNESS CALCULATION
+    #
+    # < 0.18 V = DARK
+    # > 0.25 V = NOT DARK
+    # 0.18-0.25 V = keep previous state
+    # --------------------------------------------------------
+
+    on_value:
+
+      then:
+
+        - logger.log:
+            level: INFO
+            format: "Ambient Light = %.3f V"
+            args:
+              - "x"
+
+
+        - lambda: |-
+
+            if (isnan(x)) {
+              return;
+            }
+
+            if (x < 0.18) {
+
+              id(dark_state) = true;
+
+            } else if (x > 0.25) {
+
+              id(dark_state) = false;
+
+            }
+
+
+        - binary_sensor.template.publish:
+            id: dark_detected
+            state: !lambda |-
+              return id(dark_state);
+
+
+  # ----------------------------------------------------------
+  # BATTERY VOLTAGE
+  #
+  # GPIO1
+  # ----------------------------------------------------------
+
+  - platform: adc
+
+    pin: GPIO1
+
+    id: battery_voltage
+
+    internal: true
+
+    attenuation: 2.5db
+
+    update_interval: never
+
+    filters:
+
+      - multiply: 3.7625
+
+
+    on_value:
+
+      then:
+
+        - logger.log:
+            level: INFO
+            format: "Battery Voltage = %.3f V"
+            args:
+              - "x"
+
+
+  # ----------------------------------------------------------
+  # BATTERY LEVEL
+  # ----------------------------------------------------------
+
+  - platform: copy
+
+    source_id: battery_voltage
+
+    name: "Battery Level"
+
+    id: battery_level
+
+    unit_of_measurement: "%"
+
+    accuracy_decimals: 0
+
+    device_class: battery
+
+    state_class: measurement
+
+    entity_category: diagnostic
+
+    force_update: true
+
+
+    filters:
+
+      - lambda: |-
+
+          if (x >= 4.20)
+            return 100.0;
+
+          if (x >= 4.10)
+            return 90.0 + ((x - 4.10) * 100.0);
+
+          if (x >= 4.00)
+            return 80.0 + ((x - 4.00) * 100.0);
+
+          if (x >= 3.90)
+            return 65.0 + ((x - 3.90) * 150.0);
+
+          if (x >= 3.80)
+            return 40.0 + ((x - 3.80) * 250.0);
+
+          if (x >= 3.70)
+            return 20.0 + ((x - 3.70) * 200.0);
+
+          if (x >= 3.60)
+            return 10.0 + ((x - 3.60) * 100.0);
+
+          if (x >= 3.40)
+            return (x - 3.40) * 50.0;
+
+          return 0.0;
+
+
+      - clamp:
+          min_value: 0
+          max_value: 100
+
+
+# ============================================================
+# FAILSAFE
+#
+# If Wi-Fi or HA cannot connect, return to deep sleep.
+# ============================================================
+
+script:
+
+  - id: emergency_sleep
+
+    mode: restart
+
+    then:
+
+      - delay: 30s
+
+      - binary_sensor.template.publish:
+          id: motion
+          state: OFF
+
+      - wait_until:
+          condition:
+            binary_sensor.is_off: pir_raw
+          timeout: 10s
+
+      - deep_sleep.enter:
+          id: deep_sleep_control
+
+
+# ============================================================
+# DEEP SLEEP
+# ============================================================
+
+deep_sleep:
+
+  id: deep_sleep_control
+
+
+  # ----------------------------------------------------------
+  # TIMER WAKE
+  #
+  # Refresh battery and light every 30 minutes.
+  # ----------------------------------------------------------
+
+  sleep_duration: 30min
+
+
+  # ----------------------------------------------------------
+  # MOTION WAKE
+  #
+  # GPIO4 HIGH wakes the Bee Motion immediately.
+  # ----------------------------------------------------------
+
+  esp32_ext1_wakeup:
+
+    pins:
+
+      - number: GPIO4
+        allow_other_uses: true
+
+    mode: ANY_HIGH
