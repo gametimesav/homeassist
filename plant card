@@ -1,0 +1,13 @@
+type: grid
+columns: 1
+square: false
+cards:
+  - show_name: true
+    show_icon: true
+    type: button
+    name: Plants
+    icon: mdi:sprout
+    show_state: false
+    tap_action:
+      action: navigate
+      navigation_path: /dashboard-mike/plants
