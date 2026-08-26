@@ -1,0 +1,9 @@
+{% set v = states('sensor.sun_room_bee_motion_s3_ambient_light_voltage') | float(-1) %}
+
+{% if v < 0 %}
+  Unknown
+{% elif v < 0.18 %}
+  Dark
+{% else %}
+  Light
+{% endif %}
