@@ -1,0 +1,24 @@
+type: grid
+columns: 2
+square: false
+cards:
+  - type: custom:button-card
+    template: person_card
+    entity: person.office_mike
+    variables:
+      person_name: Mike
+      person_image: /local/me.png
+      person_entity: person.office_mike
+      network_entity: binary_sensor.mike_home_network_connection
+      steps_entity: sensor.mikes_iphone_mike_steps_daily
+      battery_entity: sensor.mikes_iphone_battery_level
+  - type: custom:button-card
+    template: person_card
+    entity: person.callie
+    variables:
+      person_name: Callie
+      person_image: /local/callie.png
+      person_entity: person.callie
+      network_entity: binary_sensor.callie_home_network_connection
+      steps_entity: sensor.iphone_steps
+      battery_entity: sensor.iphone_battery_level
