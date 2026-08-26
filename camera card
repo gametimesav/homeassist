@@ -1,0 +1,642 @@
+type: grid
+columns: 2
+square: false
+cards:
+  - type: custom:button-card
+    entity: camera.outside_ac_low_resolution_channel
+    show_name: false
+    show_icon: false
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+    triggers_update:
+      - binary_sensor.outside_ac_motion
+    styles:
+      card:
+        - height: 220px
+        - padding: 0
+        - overflow: hidden
+        - border-radius: 18px
+        - border: |
+            [[[
+              return states["binary_sensor.outside_ac_motion"]?.state === "on"
+                ? "3px solid #ff3b30"
+                : "1px solid rgba(255,255,255,0.08)";
+            ]]]
+        - box-shadow: |
+            [[[
+              return states["binary_sensor.outside_ac_motion"]?.state === "on"
+                ? "0 0 18px rgba(255,59,48,0.85)"
+                : "0 6px 18px rgba(0,0,0,0.20)";
+            ]]]
+        - background-image: |
+            [[[
+              const now = new Date();
+
+              const stamp =
+                now.getFullYear().toString() +
+                String(now.getMonth() + 1).padStart(2, "0") +
+                String(now.getDate()).padStart(2, "0") +
+                String(now.getHours()).padStart(2, "0");
+
+              return `
+                linear-gradient(
+                  180deg,
+                  rgba(0,0,0,0.02) 0%,
+                  rgba(0,0,0,0.00) 42%,
+                  rgba(0,0,0,0.78) 100%
+                ),
+                url("/local/camera_snapshots/outside.jpg?v=${stamp}")
+              `;
+            ]]]
+        - background-size: cover
+        - background-position: center
+        - background-repeat: no-repeat
+      grid:
+        - grid-template-areas: |
+            "camera motion"
+            ". ."
+            "footer footer"
+        - grid-template-columns: 1fr 1fr
+        - grid-template-rows: auto 1fr auto
+        - width: 100%
+        - height: 100%
+      custom_fields:
+        camera:
+          - justify-self: start
+          - align-self: start
+          - margin: 8px 0 0 8px
+        motion:
+          - justify-self: end
+          - align-self: start
+          - margin: 8px 8px 0 0
+        footer:
+          - justify-self: stretch
+          - align-self: end
+          - padding: 0 14px 12px 14px
+    custom_fields:
+      camera: |
+        [[[
+          return `
+            <div style="
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              padding:6px;
+              border-radius:13px;
+              background:rgba(18,18,18,0.58);
+            ">
+              <ha-icon
+                icon="mdi:cctv"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>
+          `;
+        ]]]
+      motion: |
+        [[[
+          if (
+            states["binary_sensor.outside_ac_motion"]?.state !== "on"
+          ) return "";
+
+          return `
+            <div style="
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              padding:6px;
+              border-radius:13px;
+              background:rgba(220,30,30,0.88);
+              box-shadow:0 0 10px rgba(255,0,0,0.75);
+            ">
+              <ha-icon
+                icon="mdi:motion-sensor"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>
+          `;
+        ]]]
+      footer: |
+        [[[
+          const motion =
+            states["binary_sensor.outside_ac_motion"]?.state;
+
+          const now = new Date();
+
+          const time =
+            now.toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit"
+            });
+
+          const status =
+            motion === "on"
+              ? `<span style="color:#ff5f57;">● Motion</span>`
+              : `<span style="color:#57c26b;">● Clear</span>`;
+
+          return `
+            <div style="
+              display:flex;
+              align-items:flex-end;
+              justify-content:space-between;
+              width:100%;
+              color:white;
+              text-shadow:0 1px 4px rgba(0,0,0,0.8);
+            ">
+              <div>
+                <div style="
+                  font-size:20px;
+                  font-weight:700;
+                  line-height:1;
+                ">
+                  Outside
+                </div>
+
+                <div style="
+                  font-size:11px;
+                  font-weight:600;
+                  margin-top:4px;
+                ">
+                  ${status}
+                </div>
+              </div>
+
+              <div style="
+                display:flex;
+                align-items:center;
+                gap:4px;
+                font-size:10px;
+                color:rgba(255,255,255,0.75);
+              ">
+                <ha-icon
+                  icon="mdi:camera-clock"
+                  style="width:12px;height:12px;">
+                </ha-icon>
+                ${time}
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: camera.freezer_low_resolution_channel
+    show_name: false
+    show_icon: false
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+    triggers_update:
+      - binary_sensor.freezer_motion
+    styles:
+      card:
+        - height: 220px
+        - padding: 0
+        - overflow: hidden
+        - border-radius: 18px
+        - border: |
+            [[[
+              return states["binary_sensor.freezer_motion"]?.state === "on"
+                ? "3px solid #ff3b30"
+                : "1px solid rgba(255,255,255,0.08)";
+            ]]]
+        - box-shadow: |
+            [[[
+              return states["binary_sensor.freezer_motion"]?.state === "on"
+                ? "0 0 18px rgba(255,59,48,0.85)"
+                : "0 6px 18px rgba(0,0,0,0.20)";
+            ]]]
+        - background-image: |
+            [[[
+              const now = new Date();
+
+              const stamp =
+                now.getFullYear().toString() +
+                String(now.getMonth() + 1).padStart(2, "0") +
+                String(now.getDate()).padStart(2, "0") +
+                String(now.getHours()).padStart(2, "0");
+
+              return `
+                linear-gradient(
+                  180deg,
+                  rgba(0,0,0,0.02) 0%,
+                  rgba(0,0,0,0.00) 42%,
+                  rgba(0,0,0,0.78) 100%
+                ),
+                url("/local/camera_snapshots/freezer.jpg?v=${stamp}")
+              `;
+            ]]]
+        - background-size: cover
+        - background-position: center
+        - background-repeat: no-repeat
+      grid:
+        - grid-template-areas: |
+            "camera motion"
+            ". ."
+            "footer footer"
+        - grid-template-columns: 1fr 1fr
+        - grid-template-rows: auto 1fr auto
+        - width: 100%
+        - height: 100%
+      custom_fields:
+        camera:
+          - justify-self: start
+          - align-self: start
+          - margin: 8px 0 0 8px
+        motion:
+          - justify-self: end
+          - align-self: start
+          - margin: 8px 8px 0 0
+        footer:
+          - justify-self: stretch
+          - align-self: end
+          - padding: 0 14px 12px 14px
+    custom_fields:
+      camera: |
+        [[[
+          return `
+            <div style="
+              display:flex;align-items:center;justify-content:center;
+              padding:6px;border-radius:13px;
+              background:rgba(18,18,18,0.58);
+            ">
+              <ha-icon icon="mdi:cctv"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>`;
+        ]]]
+      motion: |
+        [[[
+          if (states["binary_sensor.freezer_motion"]?.state !== "on")
+            return "";
+
+          return `
+            <div style="
+              display:flex;align-items:center;justify-content:center;
+              padding:6px;border-radius:13px;
+              background:rgba(220,30,30,0.88);
+              box-shadow:0 0 10px rgba(255,0,0,0.75);
+            ">
+              <ha-icon icon="mdi:motion-sensor"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>`;
+        ]]]
+      footer: |
+        [[[
+          const motion =
+            states["binary_sensor.freezer_motion"]?.state;
+
+          const now = new Date();
+
+          const time =
+            now.toLocaleTimeString([], {
+              hour:"numeric",
+              minute:"2-digit"
+            });
+
+          const status =
+            motion === "on"
+              ? `<span style="color:#ff5f57;">● Motion</span>`
+              : `<span style="color:#57c26b;">● Clear</span>`;
+
+          return `
+            <div style="
+              display:flex;
+              align-items:flex-end;
+              justify-content:space-between;
+              width:100%;
+              color:white;
+              text-shadow:0 1px 4px rgba(0,0,0,0.8);
+            ">
+              <div>
+                <div style="font-size:20px;font-weight:700;line-height:1;">
+                  Freezer
+                </div>
+                <div style="
+                  font-size:11px;font-weight:600;margin-top:4px;
+                ">
+                  ${status}
+                </div>
+              </div>
+
+              <div style="
+                display:flex;align-items:center;gap:4px;
+                font-size:10px;
+                color:rgba(255,255,255,0.75);
+              ">
+                <ha-icon icon="mdi:camera-clock"
+                  style="width:12px;height:12px;">
+                </ha-icon>
+                ${time}
+              </div>
+            </div>`;
+        ]]]
+  - type: custom:button-card
+    entity: camera.ai_pro_low_resolution_channel_2
+    show_name: false
+    show_icon: false
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+    triggers_update:
+      - binary_sensor.ai_pro_motion
+    styles:
+      card:
+        - height: 220px
+        - padding: 0
+        - overflow: hidden
+        - border-radius: 18px
+        - border: |
+            [[[
+              return states["binary_sensor.ai_pro_motion"]?.state === "on"
+                ? "3px solid #ff3b30"
+                : "1px solid rgba(255,255,255,0.08)";
+            ]]]
+        - box-shadow: |
+            [[[
+              return states["binary_sensor.ai_pro_motion"]?.state === "on"
+                ? "0 0 18px rgba(255,59,48,0.85)"
+                : "0 6px 18px rgba(0,0,0,0.20)";
+            ]]]
+        - background-image: |
+            [[[
+              const now = new Date();
+
+              const stamp =
+                now.getFullYear().toString() +
+                String(now.getMonth() + 1).padStart(2, "0") +
+                String(now.getDate()).padStart(2, "0") +
+                String(now.getHours()).padStart(2, "0");
+
+              return `
+                linear-gradient(
+                  180deg,
+                  rgba(0,0,0,0.02) 0%,
+                  rgba(0,0,0,0.00) 42%,
+                  rgba(0,0,0,0.78) 100%
+                ),
+                url("/local/camera_snapshots/aipro.jpg?v=${stamp}")
+              `;
+            ]]]
+        - background-size: cover
+        - background-position: center
+        - background-repeat: no-repeat
+      grid:
+        - grid-template-areas: |
+            "camera motion"
+            ". ."
+            "footer footer"
+        - grid-template-columns: 1fr 1fr
+        - grid-template-rows: auto 1fr auto
+        - width: 100%
+        - height: 100%
+      custom_fields:
+        camera:
+          - justify-self: start
+          - align-self: start
+          - margin: 8px 0 0 8px
+        motion:
+          - justify-self: end
+          - align-self: start
+          - margin: 8px 8px 0 0
+        footer:
+          - justify-self: stretch
+          - align-self: end
+          - padding: 0 14px 12px 14px
+    custom_fields:
+      camera: |
+        [[[
+          return `
+            <div style="
+              display:flex;align-items:center;justify-content:center;
+              padding:6px;border-radius:13px;
+              background:rgba(18,18,18,0.58);
+            ">
+              <ha-icon icon="mdi:cctv"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>`;
+        ]]]
+      motion: |
+        [[[
+          if (states["binary_sensor.ai_pro_motion"]?.state !== "on")
+            return "";
+
+          return `
+            <div style="
+              display:flex;align-items:center;justify-content:center;
+              padding:6px;border-radius:13px;
+              background:rgba(220,30,30,0.88);
+              box-shadow:0 0 10px rgba(255,0,0,0.75);
+            ">
+              <ha-icon icon="mdi:motion-sensor"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>`;
+        ]]]
+      footer: |
+        [[[
+          const motion =
+            states["binary_sensor.ai_pro_motion"]?.state;
+
+          const now = new Date();
+
+          const time =
+            now.toLocaleTimeString([], {
+              hour:"numeric",
+              minute:"2-digit"
+            });
+
+          const status =
+            motion === "on"
+              ? `<span style="color:#ff5f57;">● Motion</span>`
+              : `<span style="color:#57c26b;">● Clear</span>`;
+
+          return `
+            <div style="
+              display:flex;
+              align-items:flex-end;
+              justify-content:space-between;
+              width:100%;
+              color:white;
+              text-shadow:0 1px 4px rgba(0,0,0,0.8);
+            ">
+              <div>
+                <div style="font-size:20px;font-weight:700;line-height:1;">
+                  AI Pro
+                </div>
+                <div style="
+                  font-size:11px;font-weight:600;margin-top:4px;
+                ">
+                  ${status}
+                </div>
+              </div>
+
+              <div style="
+                display:flex;align-items:center;gap:4px;
+                font-size:10px;
+                color:rgba(255,255,255,0.75);
+              ">
+                <ha-icon icon="mdi:camera-clock"
+                  style="width:12px;height:12px;">
+                </ha-icon>
+                ${time}
+              </div>
+            </div>`;
+        ]]]
+  - type: custom:button-card
+    entity: camera.office_high_resolution_channel
+    show_name: false
+    show_icon: false
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+    triggers_update:
+      - binary_sensor.office_motion
+    styles:
+      card:
+        - height: 220px
+        - padding: 0
+        - overflow: hidden
+        - border-radius: 18px
+        - border: |
+            [[[
+              return states["binary_sensor.office_motion"]?.state === "on"
+                ? "3px solid #ff3b30"
+                : "1px solid rgba(255,255,255,0.08)";
+            ]]]
+        - box-shadow: |
+            [[[
+              return states["binary_sensor.office_motion"]?.state === "on"
+                ? "0 0 18px rgba(255,59,48,0.85)"
+                : "0 6px 18px rgba(0,0,0,0.20)";
+            ]]]
+        - background-image: |
+            [[[
+              const now = new Date();
+
+              const stamp =
+                now.getFullYear().toString() +
+                String(now.getMonth() + 1).padStart(2, "0") +
+                String(now.getDate()).padStart(2, "0") +
+                String(now.getHours()).padStart(2, "0");
+
+              return `
+                linear-gradient(
+                  180deg,
+                  rgba(0,0,0,0.02) 0%,
+                  rgba(0,0,0,0.00) 42%,
+                  rgba(0,0,0,0.78) 100%
+                ),
+                url("/local/camera_snapshots/office.jpg?v=${stamp}")
+              `;
+            ]]]
+        - background-size: cover
+        - background-position: center
+        - background-repeat: no-repeat
+      grid:
+        - grid-template-areas: |
+            "camera motion"
+            ". ."
+            "footer footer"
+        - grid-template-columns: 1fr 1fr
+        - grid-template-rows: auto 1fr auto
+        - width: 100%
+        - height: 100%
+      custom_fields:
+        camera:
+          - justify-self: start
+          - align-self: start
+          - margin: 8px 0 0 8px
+        motion:
+          - justify-self: end
+          - align-self: start
+          - margin: 8px 8px 0 0
+        footer:
+          - justify-self: stretch
+          - align-self: end
+          - padding: 0 14px 12px 14px
+    custom_fields:
+      camera: |
+        [[[
+          return `
+            <div style="
+              display:flex;align-items:center;justify-content:center;
+              padding:6px;border-radius:13px;
+              background:rgba(18,18,18,0.58);
+            ">
+              <ha-icon icon="mdi:cctv"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>`;
+        ]]]
+      motion: |
+        [[[
+          if (states["binary_sensor.office_motion"]?.state !== "on")
+            return "";
+
+          return `
+            <div style="
+              display:flex;align-items:center;justify-content:center;
+              padding:6px;border-radius:13px;
+              background:rgba(220,30,30,0.88);
+              box-shadow:0 0 10px rgba(255,0,0,0.75);
+            ">
+              <ha-icon icon="mdi:motion-sensor"
+                style="width:16px;height:16px;color:white;">
+              </ha-icon>
+            </div>`;
+        ]]]
+      footer: |
+        [[[
+          const motion =
+            states["binary_sensor.office_motion"]?.state;
+
+          const now = new Date();
+
+          const time =
+            now.toLocaleTimeString([], {
+              hour:"numeric",
+              minute:"2-digit"
+            });
+
+          const status =
+            motion === "on"
+              ? `<span style="color:#ff5f57;">● Motion</span>`
+              : `<span style="color:#57c26b;">● Clear</span>`;
+
+          return `
+            <div style="
+              display:flex;
+              align-items:flex-end;
+              justify-content:space-between;
+              width:100%;
+              color:white;
+              text-shadow:0 1px 4px rgba(0,0,0,0.8);
+            ">
+              <div>
+                <div style="font-size:20px;font-weight:700;line-height:1;">
+                  Office
+                </div>
+                <div style="
+                  font-size:11px;font-weight:600;margin-top:4px;
+                ">
+                  ${status}
+                </div>
+              </div>
+
+              <div style="
+                display:flex;align-items:center;gap:4px;
+                font-size:10px;
+                color:rgba(255,255,255,0.75);
+              ">
+                <ha-icon icon="mdi:camera-clock"
+                  style="width:12px;height:12px;">
+                </ha-icon>
+                ${time}
+              </div>
+            </div>`;
+        ]]]
