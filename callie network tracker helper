@@ -1,0 +1,1 @@
+{{ is_state('device_tracker.iphone', 'home') }}
