@@ -1,0 +1,63 @@
+type: vertical-stack
+cards:
+  - type: tile
+    entity: button.buttonbot_press_button
+    name: ButtonBot
+    icon: mdi:robot
+    color: green
+    vertical: true
+    hide_state: true
+    tap_action:
+      action: perform-action
+      perform_action: button.press
+      target:
+        entity_id: button.buttonbot_press_button
+    features_position: bottom
+  - type: heading
+    heading: Servo Settings
+    heading_style: title
+    icon: mdi:cog
+  - type: entities
+    show_header_toggle: false
+    entities:
+      - entity: number.buttonbot_rest_position
+        name: Rest Position
+        icon: mdi:arrow-collapse-up
+      - entity: number.buttonbot_press_position
+        name: Press Position
+        icon: mdi:arrow-collapse-down
+      - entity: number.buttonbot_press_duration
+        name: Press Duration
+        icon: mdi:timer-outline
+  - type: horizontal-stack
+    cards:
+      - type: button
+        entity: button.buttonbot_move_to_rest
+        name: Move to Rest
+        icon: mdi:arrow-up-bold
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.buttonbot_move_to_rest
+      - type: button
+        entity: button.buttonbot_test_press
+        name: Test Press
+        icon: mdi:arrow-down-bold
+        tap_action:
+          action: perform-action
+          perform_action: button.press
+          target:
+            entity_id: button.buttonbot_test_press
+  - type: heading
+    heading: Device Status
+    heading_style: subtitle
+    icon: mdi:chip
+  - type: entities
+    entities:
+      - entity: sensor.buttonbot_wifi_signal
+        name: WiFi Signal
+        icon: mdi:wifi
+      - entity: sensor.buttonbot_uptime
+        name: Uptime
+        icon: mdi:clock-outline
